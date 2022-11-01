@@ -6,7 +6,7 @@ const userRouter = require('./api/user/user.route')
 
 const app = express();
 app.use(express.json())
-app.user('/auth',userRouter)
+app.use('/auth',userRouter)
 
 app.use(morgan("dev"))
 

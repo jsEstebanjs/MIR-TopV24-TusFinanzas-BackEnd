@@ -9,6 +9,7 @@ exports.auth = (req, res, next) => {
     }
 
     const [_, token] = authorization.split(" ");
+
     
     if (!token) {
       throw new Error("your session expired");
