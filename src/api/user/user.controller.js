@@ -51,10 +51,10 @@ module.exports = {
         .json({ message: "error when logging", data: err.message });
     }
   },
-  //get
+  //get por token / id
   async show(req, res) {
     try {
-      const user = await User.findById(req.user)
+      const user = await User.findById(req.user).populate("transactionsId","")
 
       if(!user){
         throw new Error("Token expired")

@@ -37,10 +37,10 @@ const userSchema = new Schema(
       required: [true, "Password is required"],
 
     },
-    // transactions: [{
-    //     // type: Schema.Types.ObjectId,
-    //     // ref: "User"
-    // }]
+    transactionsId: [{
+        type: Schema.Types.ObjectId,
+        ref: "transactions"
+    }]
   },
   {
     timestamps: true,
