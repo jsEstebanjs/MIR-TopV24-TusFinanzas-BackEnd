@@ -15,6 +15,7 @@ const transactionsSchema = new Schema(
     amount: {
         type: Number,
         required: [true, "Amount is required"],
+        match:[/^([0-9])*$/,"only numbers are allowed"]
        
       },
     type: {

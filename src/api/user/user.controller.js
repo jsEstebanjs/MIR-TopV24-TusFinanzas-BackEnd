@@ -13,12 +13,11 @@ module.exports = {
       }
       const encPassword = await bcrypt.hash(password, 8);
       const user = await User.create({ name, email, password: encPassword , picture });
-      const token = jwt.sign({ id: user._id }, "secretKey", {
+      const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
         expiresIn: 60 * 60,
       });
       res.status(200).json({ message: "user created", data: { token, email } });
     } catch (err) {
-        console.log(err)
       res.status(400).json({ message: "user not created", data: err.message });
     }
   },
@@ -38,7 +37,7 @@ module.exports = {
         throw new Error("invalid email or password");
       }
 
-      const token = jwt.sign({ id: user._id }, "secretKey", {
+      const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
         expiresIn: 60 * 60 * 24,
       });
 
@@ -73,7 +72,7 @@ module.exports = {
       if(!user){
         throw new Error("Token expired")
       }
-      const updateUser = await User.findByIdAndUpdate(req.user, newUser, { new: true } )
+    const updateUser = await User.findByIdAndUpdate(req.user, newUser, { new: true } )
     const { name, email, picture } = updateUser 
       res.status(200).json({  message: "updated user", data: { name, email, picture } })
     } catch (error) {
