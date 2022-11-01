@@ -8,17 +8,22 @@ module.exports = {
       const { name, email, password, picture } = req.body;
       if (!/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/.test(password)) {
         throw new Error(
-          "The password must be between 8 and 16 characters long, with at least one digit, at least one lowercase letter, and at least one uppercase letter. It can NOT have other symbols."
+          "La contraseña debe tener entre 8 y 16 caracteres, con al menos un dígito, al menos una letra minúscula y al menos una letra mayúscula. NO puede tener otros símbolos."
         );
       }
       const encPassword = await bcrypt.hash(password, 8);
-      const user = await User.create({ name, email, password: encPassword , picture });
+      const user = await User.create({
+        name,
+        email,
+        password: encPassword,
+        picture,
+      });
       const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
         expiresIn: 60 * 60,
       });
-      res.status(200).json({ message: "user created", data: { token, email } });
+      res.status(200).json({ message: "El Usuario se ha Creado exitosamente", data: { token, email } });
     } catch (err) {
-      res.status(400).json({ message: "user not created", data: err.message });
+      res.status(400).json({ message: "No se ha podido crear el usuario", data: err.message });
     }
   },
   async signin(req, res) {
@@ -28,13 +33,13 @@ module.exports = {
       const user = await User.findOne({ email });
 
       if (!user) {
-        throw new Error("invalid email or password");
+        throw new Error("contraseña o email invalidos");
       }
 
       const isValid = await bcrypt.compare(password, user.password);
 
       if (!isValid) {
-        throw new Error("invalid email or password");
+        throw new Error("contraseña o email invalidos");
       }
 
       const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
@@ -43,25 +48,29 @@ module.exports = {
 
       res
         .status(201)
-        .json({ message: "User logged in", data: { email, token } });
+        .json({ message: "Usuario logueado exitosamente", data: { email, token } });
     } catch (err) {
       res
         .status(400)
-        .json({ message: "error when logging", data: err.message });
+        .json({ message: "Error al loguear al usuario", data: err.message });
     }
   },
   //get por token / id
   async show(req, res) {
     try {
-      const user = await User.findById(req.user).populate("transactionsId","")
+      const user = await User.findById(req.user).populate("transactionsId", "");
 
-      if(!user){
-        throw new Error("Token expired")
+      if (!user) {
+        throw new Error("Token expirado");
       }
-      const {email, name, picture} = user
-      res.status(200).json({  message: "user found", data:{ email, name , picture } })
+      const { email, name, picture } = user;
+      res
+        .status(200)
+        .json({ message: "Usuario encontrado", data: { email, name, picture } });
     } catch (error) {
-      res.status(400).json({ message: "user is not authenticated", data: error.message })
+      res
+        .status(400)
+        .json({ message: "El usuario no existe", data: error.message });
     }
   },
   //update
@@ -69,31 +78,36 @@ module.exports = {
     try {
       const user = await User.findById(req.user);
       const newUser = req.body;
-      if(!user){
-        throw new Error("Token expired")
+      if (!user) {
+        throw new Error("Token expirado");
       }
-    const updateUser = await User.findByIdAndUpdate(req.user, newUser, { new: true } )
-    const { name, email, picture } = updateUser 
-      res.status(200).json({  message: "updated user", data: { name, email, picture } })
+      const updateUser = await User.findByIdAndUpdate(req.user, newUser, {
+        new: true,
+      });
+      const { name, email, picture } = updateUser;
+      res
+        .status(200)
+        .json({ message: "Usuario actualizado correctamente", data: { name, email, picture } });
     } catch (error) {
-      res.status(400).json({ message: "user not updated", data: error })
+      res.status(400).json({ message: "No se ha podido actualizar el usuario", data: error });
     }
   },
   //delete
   async destroy(req, res) {
-    try{
-
+    try {
       const user = await User.findByIdAndDelete(req.user);
-      //aqui se eliminaran las transaciones 
-    const { name , email , createdAt , updatedAt } = user
-    res.status(200).json({ message: "successfully deleted user", data: { name , email , createdAt , updatedAt } });
-
-    }catch(err){
-
-      res.status(400).json({ message: "could not delete user", data: err.message });
-
+      //aqui se eliminaran las transaciones
+      const { name, email, createdAt, updatedAt } = user;
+      res
+        .status(200)
+        .json({
+          message: "Usuario eliminado correctamente",
+          data: { name, email, createdAt, updatedAt },
+        });
+    } catch (err) {
+      res
+        .status(400)
+        .json({ message: "No se pudo eliminar el usuario", data: err.message });
     }
-
-
   },
 };

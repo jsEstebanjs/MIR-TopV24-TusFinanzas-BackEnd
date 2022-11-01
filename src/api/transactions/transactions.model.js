@@ -4,30 +4,27 @@ const transactionsSchema = new Schema(
   {
     description:{
       type:String,
-      required: [true, "Name is required"],
-      minlength: [15, "the minimum length is 15"],
-      maxlength: [300, "the maximum length is 300"],
+      required: [true, "El nombre es requerido"],
+      minlength: [3, "La longitud minima es 3"],
+      maxlength: [100, "La longitud maxima es 100"],
 
     },
-    // date: {
-
-    // },
     amount: {
         type: Number,
-        required: [true, "Amount is required"],
-        match:[/^([0-9])*$/,"only numbers are allowed"]
+        required: [true, "El monto es requerido"],
+        match:[/^([0-9])*$/,"Solo se aceptan numeros"]
        
       },
     type: {
       type: String,
       enum: ['Entry', 'Spent'],
-      required: [true, "Type is required"],
+      required: [true, "El tipo es requerido"],
 
     },
-    // subCategoryId: [{
+    // subCategoryId: {
     //     // type: Schema.Types.ObjectId,
-    //     // ref: "User"
-    // }]
+    //     // ref: ".."
+    // }
   },
   {
     timestamps: true,
