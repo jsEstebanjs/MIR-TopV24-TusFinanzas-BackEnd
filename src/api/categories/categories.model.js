@@ -19,7 +19,7 @@ const categoriesSchema = new Schema(
     },
     idSubCategories: [{
         type: Schema.Types.ObjectId,
-        ref: ".."
+        ref: "subCategories"
     }],
     idUser: {
         type: Schema.Types.ObjectId,

@@ -1,4 +1,5 @@
 const SubCategories = require("./subCategories.model");
+const Categories = require('../categories/categories.model');
 
 
 module.exports = {
@@ -27,50 +28,51 @@ module.exports = {
 
   async create(req, res) {
     try {
-      const user = await User.findById(req.user);
+      const {id} = req.params
+      const category = await Categories.findById(id);
       const data = req.body;
 
-      if (!user) {
-        throw new Error("Usuario no existente");
+      if (!category) {
+        throw new Error("La categoria no existente");
       }
 
-      const category = await Categories.create({ ...data, idUser: req.user });
+      const subCategory = await SubCategories.create({ ...data, idCategories: id });
 
-      user.idCategories.push(category);
-      await user.save({ validateBeforeSave: false });
+      category.idSubCategories.push(subCategory);
+      await category.save({ validateBeforeSave: false });
 
       res
         .status(200)
-        .json({ message: "Categoria creada", data: category });
+        .json({ message: "SubCategoria creada", data: subCategory });
     } catch (err) {
       res
         .status(400)
-        .json({ message: "No se ha podido crear la categoria", error: err });
+        .json({ message: "No se ha podido crear la Subcategoria", error: err });
     }
   },
   async update(req, res) {
     try {
       const { id } = req.params;
-      const category = await Categories.findById(id);
-      const infoUpdateCategory = req.body;
+      const subCategory = await SubCategories.findById(id);
+      const infoUpdateSubCategory = req.body;
 
-      if (!category) {
-        throw new Error("Categoria no encontrada");
+      if (!subCategory) {
+        throw new Error("SubCategoria no encontrada");
       }
-      const updateCategory = await Categories.findByIdAndUpdate(
+      const updateSubCategory = await Categories.findByIdAndUpdate(
         id,
-        infoUpdateCategory,
+        infoUpdateSubCategory,
         { new: true }
       );
 
       res.status(200).json({
-        message: "Categoria actualizada correctamente",
-        data: updateCategory,
+        message: "SubCategoria actualizada correctamente",
+        data: updateSubCategory,
       });
     } catch (error) {
       res
         .status(400)
-        .json({ message: "Categoria no actualizada", data: error });
+        .json({ message: "SubCategoria no actualizada", data: error });
     }
   },
 
@@ -78,15 +80,15 @@ module.exports = {
     try {
       const { id } = req.params;
 
-      const category = await Categories.findByIdAndDelete(id);
+      const subCategory = await SubCategories.findByIdAndDelete(id);
 
       res
         .status(200)
-        .json({ message: "Categoria eliminada exitosamente", data: category });
+        .json({ message: "SubCategoria eliminada exitosamente", data: subCategory});
     } catch (err) {
       res
         .status(400)
-        .json({ message: "Error al eliminar la categoria", data: err });
+        .json({ message: "Error al eliminar la subCategoria", data: err });
     }
   },
 };

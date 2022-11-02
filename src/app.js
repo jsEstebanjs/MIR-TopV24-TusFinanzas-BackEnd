@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const userRouter = require('./api/user/user.route');
 const transactionsRouter = require('./api/transactions/transactions.route');
 const categoriesRouter = require('./api/categories/categories.route');
+const subCategoriesRouter = require('./api/subCategories/subCategories.route')
 const cors = require('cors')
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(cors({
 app.use('/users',userRouter)
 app.use('/transactions',transactionsRouter)
 app.use('/categories',categoriesRouter)
+app.use('/subCategories',subCategoriesRouter)
 app.use(morgan("dev"))
 
 module.exports = app
