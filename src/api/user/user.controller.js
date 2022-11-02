@@ -18,6 +18,7 @@ module.exports = {
         password: encPassword,
         picture,
       });
+      
       const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
         expiresIn: 60 * 60,
       });
@@ -26,6 +27,7 @@ module.exports = {
       res.status(400).json({ message: "No se ha podido crear el usuario", data: err.message });
     }
   },
+
   async signin(req, res) {
     try {
       const { email, password } = req.body;
@@ -55,6 +57,7 @@ module.exports = {
         .json({ message: "Error al loguear al usuario", data: err.message });
     }
   },
+
   //get por token / id
   async show(req, res) {
     try {
@@ -73,6 +76,7 @@ module.exports = {
         .json({ message: "El usuario no existe", data: error.message });
     }
   },
+
   //update
   async update(req, res) {
     try {
@@ -92,6 +96,7 @@ module.exports = {
       res.status(400).json({ message: "No se ha podido actualizar el usuario", data: error });
     }
   },
+
   //delete
   async destroy(req, res) {
     try {

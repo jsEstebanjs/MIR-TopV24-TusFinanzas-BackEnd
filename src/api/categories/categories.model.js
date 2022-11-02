@@ -1,36 +1,35 @@
-const { Schema, model, models } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
 const categoriesSchema = new Schema(
   {
-    name:{
+    name: {
       type:String,
       required: [true, "El nombre es requerido"],
       minlength: [3, "La longitud minima del nombre es 3"],
-      maxlength: [100, "La longitud maxima del nombre es 100"],
-
+      maxlength: [100, "La longitud maxima del nombre es 100"]
     },
     favicon: {
       type: String,
     },
-    type:{
-        type: String,
-        required:[true,"el tipo es requerido"]
-
+    type: {
+      type: String,
+      enum: ['Entry', 'Expense'],
+      required:[true, "el tipo es requerido"]
     },
-    idSubCategories: [{
-        type: Schema.Types.ObjectId,
-        ref: "subCategories"
+    subcategoriesIds: [{
+      type: Schema.Types.ObjectId,
+      ref: "subcategories"
     }],
-    idUser: {
-        type: Schema.Types.ObjectId,
-        ref: "user"
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "user"
     }
   },
   {
     timestamps: true,
   }
 );
-//video en string es como se llamara nuestra coleccion
+
 const Categories = model("categories", categoriesSchema);
 
 module.exports = Categories

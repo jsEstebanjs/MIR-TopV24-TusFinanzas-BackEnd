@@ -1,0 +1,52 @@
+{
+  "categories": [
+    {
+      "name": "Ingresos",
+      "type": "Entry",
+      "subcategories": [
+        {
+          "name": "Salario",
+          "type": "Entry"
+        },
+        {
+          "name": "Trabajos esporádicos",
+          "type": "Entry"
+        }
+      ]
+    },
+    {
+      "name": "Ingresos financieros",
+      "type": "Entry",
+      "subcategories": [
+        {
+          "name": "Ingresos financieros",
+          "type": "Entry"
+        }
+      ]
+    },
+    {
+      "name": "Otros",
+      "type": "Entry",
+      "subcategories": [
+        {
+          "name": "Otros ingresos",
+          "type": "Entry"
+        }
+      ]
+    },
+    {
+      "name": "Comidas/Bebidas",
+      "type": "Expense",
+      "subcategories": [
+        {
+          "name": "Mercado",
+          "type": "Expense"
+        },
+        {
+          "name": "Restaurantes",
+          "type": "Expense"
+        }
+      ]
+    }
+  ]
+}

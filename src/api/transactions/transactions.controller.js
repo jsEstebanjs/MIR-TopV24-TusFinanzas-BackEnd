@@ -1,6 +1,6 @@
 const Transactions = require("./transactions.model");
 const User = require("../user/user.model");
-const SubCategories = require("../subCategories/subCategories.model");
+const Subcategories = require("../subcategories/subcategories.model");
 
 module.exports = {
   async listById(req, res) {
@@ -32,32 +32,34 @@ module.exports = {
 
   async create(req, res) {
     try {
-      const { id } = req.params;
+      const { subcategoryId } = req.params;
       const data = req.body;
       const user = await User.findById(req.user);
-      const subCategory = await SubCategories.findById(id);
-      if (!user || !subCategory) {
-        throw new Error("usuario o subCategoria no existen");
+      const subcategory = await Subcategories.findById(subcategoryId)
+      if (!user || !subcategory) {
+        throw new Error("usuario o subcategoria no existen");
       }
-      const transactions = await Transactions.create({
+      const transaction = await Transactions.create({
         ...data,
-        idUser: req.user,
-        idSubCategories: id,
+        userId: req.user,
+        subcategoryId: subcategory._id,
+        type: subcategory.type
       });
-      user.idTransactions.push(transactions);
+      user.transactionsIds.push(transaction);
       await user.save({ validateBeforeSave: false });
-      subCategory.idTransactions.push(transactions);
-      await subCategory.save({ validateBeforeSave: false });
+      subcategory.transactionsIds.push(transaction);
+      await subcategory.save({ validateBeforeSave: false });
 
       res
         .status(200)
-        .json({ message: "Transaccion creada", data: transactions });
+        .json({ message: "Transaccion creada", data: transaction });
     } catch (err) {
       res
         .status(400)
         .json({ message: "Transaccion no creada", error: err });
     }
   },
+
   async update(req, res) {
     try {
       const { id } = req.params;
