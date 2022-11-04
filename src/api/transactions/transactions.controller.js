@@ -45,7 +45,7 @@ module.exports = {
         userId: req.user,
         subcategoryId: subcategory._id,
         type: subcategory.type,
-        balance: lastBalance + data.amount
+        balance: lastBalance.balance + data.amount
       });
       user.transactionsIds.push(transaction);
       await user.save({ validateBeforeSave: false });
