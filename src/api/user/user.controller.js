@@ -9,6 +9,7 @@ module.exports = {
   async signup(req, res) {
     try {
       const { name, email, password, picture } = req.body;
+
       if (!/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/.test(password)) {
         throw new Error(
           "La contraseña debe tener entre 8 y 16 caracteres, con al menos un dígito, al menos una letra minúscula y al menos una letra mayúscula. NO puede tener otros símbolos."
