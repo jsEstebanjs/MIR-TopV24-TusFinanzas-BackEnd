@@ -47,7 +47,7 @@ module.exports = {
         categoryId: category._id
       })
 
-      category.subcategoriesIds.push(subcategory._id)
+      category.subcategoriesIds.push(subcategory._id);
       user.categoriesIds.push(category._id);
       await category.save({ validateBeforeSave: false });
       await user.save({ validateBeforeSave: false });
