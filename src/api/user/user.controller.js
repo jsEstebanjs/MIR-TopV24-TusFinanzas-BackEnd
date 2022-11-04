@@ -1,6 +1,9 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("./user.model");
+const defaultValues = require("../../utils/defaultValues.json");
+const Categories = require("../categories/categories.model");
+const Subcategories = require("../subcategories/subcategories.model");
 
 module.exports = {
   async signup(req, res) {
@@ -18,6 +21,32 @@ module.exports = {
         password: encPassword,
         picture,
       });
+
+      for (const category of defaultValues.categories) {
+        const newUser = await User.findById(user._id);
+        const {_id: categoryId} = await Categories.create({ 
+          name: category.name,
+          type: category.type,
+          favicon: category.favicon,
+          userId: newUser.id,
+        });
+
+        for (const subcategory of category.subcategories) {
+          const newCategory = await Categories.findById(categoryId)
+          const newSubcategory = await Subcategories.create({
+            name: subcategory.name,
+            favicon: subcategory.favicon,
+            type: subcategory.type,
+            categoryId: newCategory._id
+          });
+
+          newCategory.subcategoriesIds.push(newSubcategory._id);
+          await newCategory.save({ validateBeforeSave: false });
+        };
+
+        newUser.categoriesIds.push(categoryId);
+        await newUser.save({ validateBeforeSave: false });
+      }
       
       const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
         expiresIn: 60 * 60,
