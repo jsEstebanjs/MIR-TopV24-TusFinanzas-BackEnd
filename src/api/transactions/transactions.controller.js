@@ -38,12 +38,14 @@ module.exports = {
       const subcategory = await Subcategories.findById(subcategoryId)
       if (!user || !subcategory) {
         throw new Error("usuario o subcategoria no existen");
-      }
+      };
+      const lastBalance = await Transactions.findById(user.transactionsIds[user.transactionsIds.length - 1])
       const transaction = await Transactions.create({
         ...data,
         userId: req.user,
         subcategoryId: subcategory._id,
-        type: subcategory.type
+        type: subcategory.type,
+        balance: lastBalance + data.amount
       });
       user.transactionsIds.push(transaction);
       await user.save({ validateBeforeSave: false });
