@@ -4,6 +4,7 @@ const User = require("./user.model");
 const defaultValues = require("../../utils/defaultValues.json");
 const Categories = require("../categories/categories.model");
 const Subcategories = require("../subcategories/subcategories.model");
+const { transporter, welcome } = require('../../utils/mailer');
 
 module.exports = {
   async signup(req, res) {
@@ -22,7 +23,7 @@ module.exports = {
         password: encPassword,
         picture,
       });
-
+      await transporter.sendMail(welcome(user))
       for (const category of defaultValues.categories) {
         const newUser = await User.findById(user._id);
         const {_id: categoryId} = await Categories.create({ 
