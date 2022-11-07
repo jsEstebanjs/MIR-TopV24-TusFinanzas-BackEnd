@@ -38,12 +38,18 @@ module.exports = {
       const subcategory = await Subcategories.findById(subcategoryId)
       if (!user || !subcategory) {
         throw new Error("usuario o subcategoria no existen");
+      };
+      const lastBalance = await Transactions.findById(user.transactionsIds[user.transactionsIds.length - 1])
+      const newBalance = (data.type === "expense" ? lastBalance.balance - data.amount : lastBalance.balance + data.amount)
+      if(newBalace < 0){
+        throw new Error("no tiene saldo disponible para esa transaccion");
       }
       const transaction = await Transactions.create({
         ...data,
         userId: req.user,
         subcategoryId: subcategory._id,
-        type: subcategory.type
+        type: subcategory.type,
+        balance: newBalance
       });
       user.transactionsIds.push(transaction);
       await user.save({ validateBeforeSave: false });

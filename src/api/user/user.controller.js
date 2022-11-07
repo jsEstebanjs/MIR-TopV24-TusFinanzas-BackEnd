@@ -4,11 +4,13 @@ const User = require("./user.model");
 const defaultValues = require("../../utils/defaultValues.json");
 const Categories = require("../categories/categories.model");
 const Subcategories = require("../subcategories/subcategories.model");
+const { transporter, welcome } = require('../../utils/mailer');
 
 module.exports = {
   async signup(req, res) {
     try {
       const { name, email, password, picture } = req.body;
+
       if (!/^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/.test(password)) {
         throw new Error(
           "La contraseña debe tener entre 8 y 16 caracteres, con al menos un dígito, al menos una letra minúscula y al menos una letra mayúscula. NO puede tener otros símbolos."
@@ -21,7 +23,7 @@ module.exports = {
         password: encPassword,
         picture,
       });
-
+      await transporter.sendMail(welcome(user))
       for (const category of defaultValues.categories) {
         const newUser = await User.findById(user._id);
         const {_id: categoryId} = await Categories.create({ 
