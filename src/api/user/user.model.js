@@ -27,7 +27,6 @@ const userSchema = new Schema(
     },
     picture: {
       type: String,
-      //variable de entorno
       default: `${process.env.IMG_PLACEHOLDER}`
     },
     password: {

@@ -4,7 +4,7 @@ const User = require("./user.model");
 const defaultValues = require("../../utils/defaultValues.json");
 const Categories = require("../categories/categories.model");
 const Subcategories = require("../subcategories/subcategories.model");
-const { transporter, welcome } = require('../../utils/mailer');
+const { transporter, welcome } = require("../../utils/mailer");
 
 module.exports = {
   async signup(req, res) {
@@ -23,10 +23,10 @@ module.exports = {
         password: encPassword,
         picture,
       });
-      await transporter.sendMail(welcome(user))
+      await transporter.sendMail(welcome(user));
       for (const category of defaultValues.categories) {
         const newUser = await User.findById(user._id);
-        const {_id: categoryId} = await Categories.create({ 
+        const { _id: categoryId } = await Categories.create({
           name: category.name,
           type: category.type,
           favicon: category.favicon,
@@ -34,28 +34,38 @@ module.exports = {
         });
 
         for (const subcategory of category.subcategories) {
-          const newCategory = await Categories.findById(categoryId)
+          const newCategory = await Categories.findById(categoryId);
           const newSubcategory = await Subcategories.create({
             name: subcategory.name,
             favicon: subcategory.favicon,
             type: subcategory.type,
-            categoryId: newCategory._id
+            categoryId: newCategory._id,
           });
 
           newCategory.subcategoriesIds.push(newSubcategory._id);
           await newCategory.save({ validateBeforeSave: false });
-        };
+        }
 
         newUser.categoriesIds.push(categoryId);
         await newUser.save({ validateBeforeSave: false });
       }
-      
+
       const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
         expiresIn: 60 * 60,
       });
-      res.status(200).json({ message: "El Usuario se ha Creado exitosamente", data: { token, email } });
+      res
+        .status(200)
+        .json({
+          message: "El Usuario se ha Creado exitosamente",
+          data: { token, email },
+        });
     } catch (err) {
-      res.status(400).json({ message: "No se ha podido crear el usuario", data: err.message });
+      res
+        .status(400)
+        .json({
+          message: "No se ha podido crear el usuario",
+          data: err.message,
+        });
     }
   },
 
@@ -81,7 +91,10 @@ module.exports = {
 
       res
         .status(201)
-        .json({ message: "Usuario logueado exitosamente", data: { email, token } });
+        .json({
+          message: "Usuario logueado exitosamente",
+          data: { email, token },
+        });
     } catch (err) {
       res
         .status(400)
@@ -92,15 +105,30 @@ module.exports = {
   //get por token / id
   async show(req, res) {
     try {
-      const user = await User.findById(req.user).populate("transactionsId", "");
+      const user = await User.findById(req.user).populate({
+        path:"categoriesIds",
+        select:"name favicon type subcategoriesIds",
+        populate:{
+          path:"subcategoriesIds",
+          select:"name favicon type transactionsIds",
+          populate:{
+            path:"transactionsIds",
+            select:"description amount type balance"
+          }
+        }
+        
+    });
 
       if (!user) {
         throw new Error("Token expirado");
       }
-      const { email, name, picture } = user;
+      const { email, name, picture, transactionsIds, categoriesIds } = user;
       res
         .status(200)
-        .json({ message: "Usuario encontrado", data: { email, name, picture } });
+        .json({
+          message: "Usuario encontrado",
+          data: { email, name, picture, transactionsIds, categoriesIds },
+        });
     } catch (error) {
       res
         .status(400)
@@ -122,9 +150,17 @@ module.exports = {
       const { name, email, picture } = updateUser;
       res
         .status(200)
-        .json({ message: "Usuario actualizado correctamente", data: { name, email, picture } });
+        .json({
+          message: "Usuario actualizado correctamente",
+          data: { name, email, picture },
+        });
     } catch (error) {
-      res.status(400).json({ message: "No se ha podido actualizar el usuario", data: error });
+      res
+        .status(400)
+        .json({
+          message: "No se ha podido actualizar el usuario",
+          data: error,
+        });
     }
   },
 
@@ -134,12 +170,10 @@ module.exports = {
       const user = await User.findByIdAndDelete(req.user);
       //aqui se eliminaran las transaciones
       const { name, email, createdAt, updatedAt } = user;
-      res
-        .status(200)
-        .json({
-          message: "Usuario eliminado correctamente",
-          data: { name, email, createdAt, updatedAt },
-        });
+      res.status(200).json({
+        message: "Usuario eliminado correctamente",
+        data: { name, email, createdAt, updatedAt },
+      });
     } catch (err) {
       res
         .status(400)
