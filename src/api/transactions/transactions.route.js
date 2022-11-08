@@ -4,7 +4,7 @@ const { auth } = require('../../utils/auth')
 
 router.route("/").get(transactionsController.listById);
 router.route("/:id").get(transactionsController.show);
-router.route("/:id").post(auth,transactionsController.create);
+router.route("/create").post(auth,transactionsController.create);
 router.route("/:id").delete(transactionsController.destroy);
 router.route("/:id").put(transactionsController.update);
 

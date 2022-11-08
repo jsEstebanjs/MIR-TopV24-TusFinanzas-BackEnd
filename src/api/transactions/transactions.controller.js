@@ -32,37 +32,46 @@ module.exports = {
 
   async create(req, res) {
     try {
-      const { subcategoryId } = req.params;
+      const { subcategoryId } = req.body;
       const data = req.body;
       const user = await User.findById(req.user);
-      const subcategory = await Subcategories.findById(subcategoryId)
+      const subcategory = await Subcategories.findById(subcategoryId);
       if (!user || !subcategory) {
         throw new Error("usuario o subcategoria no existen");
-      };
-      const lastBalance = await Transactions.findById(user.transactionsIds[user.transactionsIds.length - 1])
-      const newBalance = (data.type === "expense" ? lastBalance.balance - data.amount : lastBalance.balance + data.amount)
-      if(newBalace < 0){
+      }
+      const lastBalance = await Transactions.findById(
+        user.transactionsIds[user.transactionsIds.length - 1]
+      );
+      let newBalance;
+      if (user.transactionsIds.length === 0) {
+        newBalance = data.amount;
+      } else {
+        newBalance =
+          subcategory.type === "Expense"
+            ? lastBalance.balance - data.amount
+            : lastBalance.balance + data.amount;
+      }
+      if (newBalance < 0) {
         throw new Error("no tiene saldo disponible para esa transaccion");
       }
       const transaction = await Transactions.create({
         ...data,
         userId: req.user,
-        subcategoryId: subcategory._id,
+        subcategoryId: subcategoryId,
         type: subcategory.type,
-        balance: newBalance
+        balance: newBalance,
       });
       user.transactionsIds.push(transaction);
       await user.save({ validateBeforeSave: false });
       subcategory.transactionsIds.push(transaction);
       await subcategory.save({ validateBeforeSave: false });
-
       res
         .status(200)
         .json({ message: "Transaccion creada", data: transaction });
     } catch (err) {
       res
         .status(400)
-        .json({ message: "Transaccion no creada", error: err });
+        .json({ message: "Transaccion no creada", error: err.message });
     }
   },
 
