@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const userRouter = require('./api/user/user.route');
 const transactionsRouter = require('./api/transactions/transactions.route');
 const categoriesRouter = require('./api/categories/categories.route');
-const subcategoriesRouter = require('./api/subcategories/subcategories.route')
+const subcategoriesRouter = require('./api/subCategories/subCategories.route')
 const cors = require('cors')
 
 const app = express();

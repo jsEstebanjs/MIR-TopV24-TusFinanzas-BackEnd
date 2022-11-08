@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("./user.model");
 const defaultValues = require("../../utils/defaultValues.json");
 const Categories = require("../categories/categories.model");
-const Subcategories = require("../subcategories/subcategories.model");
+const Subcategories = require("../subCategories/subCategories.model");
 const { transporter, welcome } = require("../../utils/mailer");
 
 module.exports = {
