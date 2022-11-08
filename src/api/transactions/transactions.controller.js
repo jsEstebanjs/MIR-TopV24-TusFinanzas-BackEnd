@@ -1,6 +1,6 @@
 const Transactions = require("./transactions.model");
 const User = require("../user/user.model");
-const Subcategories = require("../subcategories/subcategories.model");
+const Subcategories = require("../subCategories/subCategories.model");
 
 module.exports = {
   async listById(req, res) {

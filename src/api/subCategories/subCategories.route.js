@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const subcategoriesController = require("./subcategories.controller");
+const subcategoriesController = require("./subCategories.controller");
 const { auth } = require('../../utils/auth')
 
 router.route("/").get(subcategoriesController.listById);

@@ -1,4 +1,4 @@
-const Subcategories = require("./subcategories.model");
+const Subcategories = require("./subCategories.model");
 const Categories = require('../categories/categories.model');
 
 
