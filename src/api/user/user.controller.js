@@ -4,7 +4,6 @@ const User = require("./user.model");
 const defaultValues = require("../../utils/defaultValues.json");
 const Categories = require("../categories/categories.model");
 const Subcategories = require("../subCategories/subCategories.model");
-const { transporter, welcome } = require("../../utils/mailer");
 
 module.exports = {
   async signup(req, res) {
@@ -23,41 +22,46 @@ module.exports = {
         password: encPassword,
         picture,
       });
-      await transporter.sendMail(welcome(user));
+
       for (const category of defaultValues.categories) {
-        const newUser = await User.findById(user._id);
-        const { _id: categoryId } = await Categories.create({
+        const newCategory = await Categories.create({
           name: category.name,
           type: category.type,
           favicon: category.favicon,
-          userId: newUser.id,
+          userId: user.id,
         });
 
         for (const subcategory of category.subcategories) {
-          const newCategory = await Categories.findById(categoryId);
           const newSubcategory = await Subcategories.create({
             name: subcategory.name,
             favicon: subcategory.favicon,
             type: subcategory.type,
             categoryId: newCategory._id,
           });
-
           newCategory.subcategoriesIds.push(newSubcategory._id);
-          await newCategory.save({ validateBeforeSave: false });
         }
-
-        newUser.categoriesIds.push(categoryId);
-        await newUser.save({ validateBeforeSave: false });
+        await newCategory.save({ validateBeforeSave: false });
+        user.categoriesIds.push(newCategory._id);
       }
+      await user.save({ validateBeforeSave: false });
 
       const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
         expiresIn: 60 * 60,
       });
+      const newUser = await User.findById(user._id).populate({
+        path:"categoriesIds",
+        select:"name favicon type subcategoriesIds",
+        populate:{
+          path:"subcategoriesIds",
+          select:"name favicon type transactionsIds",
+        }
+      });
+
       res
         .status(200)
         .json({
           message: "El Usuario se ha Creado exitosamente",
-          data: { token, email },
+          data: { token, user: newUser },
         });
     } catch (err) {
       res
@@ -73,7 +77,14 @@ module.exports = {
     try {
       const { email, password } = req.body;
 
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).populate({
+        path:"categoriesIds",
+        select:"name favicon type subcategoriesIds",
+        populate:{
+          path:"subcategoriesIds",
+          select:"name favicon type transactionsIds",
+        }
+      });
 
       if (!user) {
         throw new Error("contraseña o email invalidos");
@@ -93,7 +104,7 @@ module.exports = {
         .status(201)
         .json({
           message: "Usuario logueado exitosamente",
-          data: { email, token },
+          data: { user, token },
         });
     } catch (err) {
       res
@@ -111,13 +122,8 @@ module.exports = {
         populate:{
           path:"subcategoriesIds",
           select:"name favicon type transactionsIds",
-          populate:{
-            path:"transactionsIds",
-            select:"description amount type balance"
-          }
         }
-        
-    });
+      });
 
       if (!user) {
         throw new Error("Token expirado");
