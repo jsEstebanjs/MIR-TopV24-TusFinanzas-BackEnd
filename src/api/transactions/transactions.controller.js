@@ -42,24 +42,40 @@ module.exports = {
       const lastBalance = await Transactions.findById(
         user.transactionsIds[user.transactionsIds.length - 1]
       );
-      let newBalance;
+      let newTodoEntry;
+      let newTodoExpense;
       if (user.transactionsIds.length === 0) {
-        newBalance = data.amount;
+        if (subcategory.type === "Entry") {
+          newTodoEntry = data.amount;
+          newTodoExpense = 0;
+        } else {
+          newTodoEntry = 0;
+          newTodoExpense = data.amount;
+        }
       } else {
-        newBalance =
-          subcategory.type === "Expense"
-            ? lastBalance.balance - data.amount
-            : lastBalance.balance + data.amount;
+        if (subcategory.type === "Entry") {
+          newTodoEntry = lastBalance.todoEntry + data.amount;
+          newTodoExpense = lastBalance.todoExpense;
+        } else {
+          newTodoEntry = lastBalance.todoEntry;
+          newTodoExpense = lastBalance.todoExpense + data.amount;
+        }
       }
-      if (newBalance < 0) {
-        throw new Error("no tiene saldo disponible para esa transaccion");
+      if((newTodoEntry - newTodoExpense) < 0){
+        throw new Error("No tienes Saldo para esta transaccion");
       }
+
+
       const transaction = await Transactions.create({
         ...data,
         userId: req.user,
         subcategoryId: subcategoryId,
         type: subcategory.type,
-        balance: newBalance,
+        balance: newTodoEntry - newTodoExpense,
+        todoEntry: newTodoEntry,
+        todoExpense: newTodoExpense,
+        nameCategory: subcategory.name,
+        favicon: subcategory.favicon,
       });
       user.transactionsIds.push(transaction);
       await user.save({ validateBeforeSave: false });

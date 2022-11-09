@@ -28,6 +28,18 @@ const transactionsSchema = new Schema(
     },
     balance:{
       type:Number
+    },
+    todoEntry:{
+      type:Number
+    },
+    todoExpense:{
+      type:Number
+    },
+    nameCategory:{
+      type:String
+    },
+    favicon:{
+      type:String
     }
   },
   {
