@@ -3,9 +3,11 @@ const User = require("../user/user.model");
 const Subcategories = require("../subCategories/subCategories.model");
 
 module.exports = {
-  async listById(req, res) {
+  async list(req, res) {
     try {
-      const transactions = await Transactions.find();
+      const transactions = await Transactions.paginate({},{
+        
+      });
       res
         .status(200)
         .json({ message: "Transacciones encontradas", data: transactions });
@@ -16,7 +18,7 @@ module.exports = {
     }
   },
 
-  async show(req, res) {
+  async listById(req, res) {
     try {
       const { id } = req.params;
 

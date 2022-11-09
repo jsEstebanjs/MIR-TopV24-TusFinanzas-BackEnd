@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const transactionsSchema = new Schema(
   {
@@ -47,6 +48,7 @@ const transactionsSchema = new Schema(
   }
 );
 
+transactionsSchema.plugin(mongoosePaginate);
 const Transactions = model("transactions", transactionsSchema);
 
 module.exports = Transactions
