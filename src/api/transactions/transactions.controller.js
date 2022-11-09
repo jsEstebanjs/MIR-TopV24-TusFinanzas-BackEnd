@@ -4,8 +4,15 @@ const Subcategories = require("../subCategories/subCategories.model");
 
 module.exports = {
   async list(req, res) {
+    const {limit = 10 , page = 1} = req.query 
+    const user = await User.findById(req.user);
+    if(!user){
+      throw new Error("usuario no encontrado");
+    }
     try {
-      const transactions = await Transactions.paginate({},{
+      const transactions = await Transactions.paginate({ userId:req.user },{
+        limit:limit,
+        page:page
         
       });
       res
