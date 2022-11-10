@@ -121,8 +121,8 @@ module.exports = {
         } else {
           if (
             oneTrasaction.createdAt.getMonth() ===
-            lastTransactions[lastTransactions.length - 1].createdAt.getMonth() -
-              1
+            lastTransactions[lastTransactions.length - 1].createdAt.getMonth() -1
+            || lastTransactions[lastTransactions.length - 1].createdAt.getMonth() < oneTrasaction.createdAt.getMonth()
           ) {
             lastTransactions.push(oneTrasaction);
           } else if (
@@ -148,7 +148,6 @@ module.exports = {
         data: lastTransactions,
       });
     } catch (err) {
-      console.log(err);
       res
         .status(400)
         .json({ message: "Transacciones no encontradas", error: err });
