@@ -12,7 +12,8 @@ module.exports = {
     try {
       const transactions = await Transactions.paginate({ userId:req.user },{
         limit:limit,
-        page:page
+        page:page,
+        sort: { createdAt: -1 },
         
       });
       res
