@@ -4,18 +4,20 @@ const Subcategories = require("../subCategories/subCategories.model");
 
 module.exports = {
   async list(req, res) {
-    const {limit = 10 , page = 1} = req.query 
+    const { limit = 10, page = 1 } = req.query;
     const user = await User.findById(req.user);
-    if(!user){
+    if (!user) {
       throw new Error("usuario no encontrado");
     }
     try {
-      const transactions = await Transactions.paginate({ userId:req.user },{
-        limit:limit,
-        page:page,
-        sort: { createdAt: -1 },
-        
-      });
+      const transactions = await Transactions.paginate(
+        { userId: req.user },
+        {
+          limit: limit,
+          page: page,
+          sort: { createdAt: -1 },
+        }
+      );
       res
         .status(200)
         .json({ message: "Transacciones encontradas", data: transactions });
@@ -71,10 +73,9 @@ module.exports = {
           newTodoExpense = lastBalance.todoExpense + data.amount;
         }
       }
-      if((newTodoEntry - newTodoExpense) < 0){
+      if (newTodoEntry - newTodoExpense < 0) {
         throw new Error("No tienes Saldo para esta transaccion");
       }
-
 
       const transaction = await Transactions.create({
         ...data,
@@ -98,6 +99,59 @@ module.exports = {
       res
         .status(400)
         .json({ message: "Transaccion no creada", error: err.message });
+    }
+  },
+  async lastMonthsTransactions(req, res) {
+    try {
+      const user = User.findById(req.user);
+      const transactions = await Transactions.find({ userId: req.user });
+      if (!user || !transactions) {
+        throw new Error("no hay usuario o transacciones");
+      }
+      transactions.reverse();
+
+      const lastTransactions = [];
+
+      for (const oneTrasaction of transactions) {
+        if(lastTransactions.length === 6){
+          return
+        }
+        if (lastTransactions.length === 0) {
+          lastTransactions.push(oneTrasaction);
+        } else {
+          if (
+            oneTrasaction.createdAt.getMonth() ===
+            lastTransactions[lastTransactions.length - 1].createdAt.getMonth() -
+              1
+          ) {
+            lastTransactions.push(oneTrasaction);
+          } else if (
+            oneTrasaction.createdAt.getMonth() !==
+            lastTransactions[lastTransactions.length - 1].createdAt.getMonth()
+          ) {
+            const obj = {
+              userId: `${oneTrasaction.userId}`,
+              balance: oneTransaction.balance,
+              createdAt: `${oneTrasaction.createdAt.getFullYear()}-${
+                oneTrasaction.createdAt.getMonth() + 1
+              }-${oneTrasaction.createdAt.getDate() + 1}`,
+            };
+            lastTransactions.push(obj)
+            lastTransactions.push(oneTrasaction)
+
+          }
+        }
+      }
+
+      res.status(200).json({
+        message: "Transacciones  de los ultimos 6 meses encontradas",
+        data: lastTransactions,
+      });
+    } catch (err) {
+      console.log(err);
+      res
+        .status(400)
+        .json({ message: "Transacciones no encontradas", error: err });
     }
   },
 
