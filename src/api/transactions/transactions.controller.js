@@ -101,6 +101,7 @@ module.exports = {
         .json({ message: "Transaccion no creada", error: err.message });
     }
   },
+
   async lastMonthsTransactions(req, res) {
     try {
       const user = User.findById(req.user);
@@ -108,49 +109,65 @@ module.exports = {
       if (!user || !transactions) {
         throw new Error("no hay usuario o transacciones");
       }
-      transactions.reverse();
 
-      const lastTransactions = [];
-
-      for (const oneTrasaction of transactions) {
-        if(lastTransactions.length === 6){
-          return
+      const months = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre",
+      ];
+      const transactionsPerMonth = [];
+      for (let i = transactions.length - 1; i >= 0; i--) {
+        if (transactionsPerMonth.length === 6) {
+          break;
         }
-        if (lastTransactions.length === 0) {
-          lastTransactions.push(oneTrasaction);
+        let currentMonth = transactions[i].createdAt.getMonth();
+        let lastMonth = transactionsPerMonth.length
+          ? transactionsPerMonth[transactionsPerMonth.length - 1].id
+          : null;
+        if (i === transactions.length - 1) {
+          transactionsPerMonth.push({
+            id: currentMonth,
+            balance: transactions[i].balance,
+            month: months[currentMonth],
+            test: transactions[i]._id,
+          });
         } else {
-          if (
-            oneTrasaction.createdAt.getMonth() ===
-            lastTransactions[lastTransactions.length - 1].createdAt.getMonth() -1
-            || lastTransactions[lastTransactions.length - 1].createdAt.getMonth() < oneTrasaction.createdAt.getMonth()
+          while (
+            lastMonth !== currentMonth &&
+            transactionsPerMonth.length < 6
           ) {
-            lastTransactions.push(oneTrasaction);
-          } else if (
-            oneTrasaction.createdAt.getMonth() !==
-            lastTransactions[lastTransactions.length - 1].createdAt.getMonth()
-          ) {
-            const obj = {
-              userId: `${oneTrasaction.userId}`,
-              balance: oneTransaction.balance,
-              createdAt: `${oneTrasaction.createdAt.getFullYear()}-${
-                oneTrasaction.createdAt.getMonth() + 1
-              }-${oneTrasaction.createdAt.getDate() + 1}`,
-            };
-            lastTransactions.push(obj)
-            lastTransactions.push(oneTrasaction)
-
+            if (lastMonth - 1 >= 0) {
+              lastMonth -= 1;
+            } else {
+              lastMonth = 11;
+            }
+            transactionsPerMonth.push({
+              id: lastMonth,
+              balance: transactions[i].balance,
+              month: months[lastMonth],
+              test: transactions[i]._id,
+            });
           }
         }
       }
 
       res.status(200).json({
         message: "Transacciones  de los ultimos 6 meses encontradas",
-        data: lastTransactions,
+        data: transactionsPerMonth,
       });
     } catch (err) {
       res
         .status(400)
-        .json({ message: "Transacciones no encontradas", error: err });
+        .json({ message: "Transacciones no encontradas", error: err.message });
     }
   },
 
