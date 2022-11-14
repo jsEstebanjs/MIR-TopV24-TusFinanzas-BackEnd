@@ -1,8 +1,9 @@
 const Categories = require("./categories.model");
 const User = require("../user/user.model");
+const Subcategories = require("../subCategories/subCategories.model");
 
 module.exports = {
-  async listById(req, res) {
+  async show(req, res) {
     try {
       const categories = await Categories.find();
       res
@@ -13,7 +14,7 @@ module.exports = {
     }
   },
 
-  async show(req, res) {
+  async listById(req, res) {
     try {
       const { id } = req.params;
 
@@ -34,9 +35,21 @@ module.exports = {
         throw new Error("Usuario no existente");
       }
 
-      const category = await Categories.create({ ...data, idUser: req.user });
+      const category = await Categories.create({ 
+        ...data,
+        userId: req.user,
+      });
 
-      user.idCategories.push(category);
+      const subcategory = await Subcategories.create({
+        name: category.name,
+        favicon: category.favicon,
+        type: category.type,
+        categoryId: category._id
+      })
+
+      category.subcategoriesIds.push(subcategory._id);
+      user.categoriesIds.push(category._id);
+      await category.save({ validateBeforeSave: false });
       await user.save({ validateBeforeSave: false });
 
       res
@@ -48,6 +61,7 @@ module.exports = {
         .json({ message: "No se ha podido crear la categoria", error: err });
     }
   },
+  
   async update(req, res) {
     try {
       const { id } = req.params;

@@ -1,4 +1,5 @@
-const { Schema, model, models } = require("mongoose");
+const { Schema, model } = require("mongoose");
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const transactionsSchema = new Schema(
   {
@@ -7,30 +8,47 @@ const transactionsSchema = new Schema(
       required: [true, "El nombre es requerido"],
       minlength: [3, "La longitud minima es 3"],
       maxlength: [100, "La longitud maxima es 100"],
-
     },
     amount: {
-        type: Number,
-        required: [true, "El monto es requerido"],
-        match:[/^([0-9])*$/,"Solo se aceptan numeros"]
-       
+      type: Number,
+      required: [true, "El monto es requerido"],
+      match:[/^([0-9])*$/, "Solo se aceptan numeros"]
       },
     type: {
       type: String,
-      enum: ['Entry', 'Spent'],
+      enum: ['Entry', 'Expense'],
       required: [true, "El tipo es requerido"],
-
     },
-    // subCategoryId: {
-    //     // type: Schema.Types.ObjectId,
-    //     // ref: ".."
-    // }
+    subcategoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "subcategories"
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "user"
+    },
+    balance:{
+      type:Number
+    },
+    todoEntry:{
+      type:Number
+    },
+    todoExpense:{
+      type:Number
+    },
+    nameCategory:{
+      type:String
+    },
+    favicon:{
+      type:String
+    }
   },
   {
     timestamps: true,
   }
 );
-//video en string es como se llamara nuestra coleccion
+
+transactionsSchema.plugin(mongoosePaginate);
 const Transactions = model("transactions", transactionsSchema);
 
 module.exports = Transactions

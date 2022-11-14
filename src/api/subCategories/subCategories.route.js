@@ -1,12 +1,12 @@
 const router = require("express").Router();
-const subCategoriesController = require("./subCategories.controller");
+const subcategoriesController = require("./subCategories.controller");
 const { auth } = require('../../utils/auth')
 
-router.route("/").get(categoriesController.listById);
-router.route("/:id").get(categoriesController.show);
-router.route("/:id").post(categoriesController.create);
-router.route("/:id").put(categoriesController.update);
-router.route("/:id").delete(categoriesController.destroy);
+router.route("/").get(subcategoriesController.listById);
+router.route("/:id").get(subcategoriesController.show);
+router.route("/:id").post(subcategoriesController.create);
+router.route("/:id").put(subcategoriesController.update);
+router.route("/:id").delete(subcategoriesController.destroy);
 
 
 

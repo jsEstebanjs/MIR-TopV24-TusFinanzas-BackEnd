@@ -2,8 +2,8 @@ const { Schema, model, models } = require("mongoose");
 
 const userSchema = new Schema(
   {
-    name:{
-      type:String,
+    name: {
+      type: String,
       required: [true, "El nombre es requerido"],
       minlength: [3, "La longitud minima del nombre es 3"],
       maxlength: [100, "La longitud maxima del nombre es 100"],
@@ -26,29 +26,27 @@ const userSchema = new Schema(
       },
     },
     picture: {
-        type: String,
-        //variable de entorno
-        default: `${process.env.IMG_PLACEHOLDER}`
-      },
+      type: String,
+      default: `${process.env.IMG_PLACEHOLDER}`
+    },
     password: {
       type: String,
       required: [true, "La contraseña es requerida"],
-
     },
-    idTransactions: [{
-        type: Schema.Types.ObjectId,
-        ref: "transactions"
+    transactionsIds: [{
+      type: Schema.Types.ObjectId,
+      ref: "transactions"
     }],
-    idCategories: [{
+    categoriesIds: [{
       type: Schema.Types.ObjectId,
       ref: "categories"
-  }]
+    }]
   },
   {
     timestamps: true,
   }
 );
-//video en string es como se llamara nuestra coleccion
+
 const User = model("user", userSchema);
 
 module.exports = User
