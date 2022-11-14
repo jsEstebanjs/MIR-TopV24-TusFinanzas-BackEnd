@@ -170,6 +170,36 @@ module.exports = {
         .json({ message: "Transacciones no encontradas", error: err.message });
     }
   },
+  async TransactionsOfTheMonth(req, res) {
+    try {
+      const { month, year } = req.query;
+      const start = new Date(year, month, 1);
+      const end = new Date(year, month, 31);
+      const user = User.findById(req.user);
+      const transactions = await Transactions.find({
+        userId: req.user,
+        createdAt: {
+          $gte: start,
+          $lte: end,
+        },
+      });
+      if (!user || !transactions) {
+        throw new Error("no hay usuario o transacciones");
+      }
+
+      res.status(200).json({
+        message: "Transacciones del meses encontradas",
+        data: transactions,
+      });
+    } catch (err) {
+      res
+        .status(400)
+        .json({
+          message: "Transacciones del mes no encontradas",
+          error: err.message,
+        });
+    }
+  },
 
   async update(req, res) {
     try {
