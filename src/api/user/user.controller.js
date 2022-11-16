@@ -113,7 +113,7 @@ module.exports = {
     }
   },
 
-  //get por token / id
+
   async show(req, res) {
     try {
       const user = await User.findById(req.user).populate({
@@ -142,13 +142,16 @@ module.exports = {
     }
   },
 
-  //update
+
   async update(req, res) {
     try {
       const user = await User.findById(req.user);
       const newUser = req.body;
       if (!user) {
         throw new Error("Token expirado");
+      }
+      if(newUser.resetPicture){
+        newUser.picture = `${process.env.IMG_PLACEHOLDER}`
       }
       const updateUser = await User.findByIdAndUpdate(req.user, newUser, {
         new: true,
@@ -170,11 +173,10 @@ module.exports = {
     }
   },
 
-  //delete
+
   async destroy(req, res) {
     try {
       const user = await User.findByIdAndDelete(req.user);
-      //aqui se eliminaran las transaciones
       const { name, email, createdAt, updatedAt } = user;
       res.status(200).json({
         message: "Usuario eliminado correctamente",
