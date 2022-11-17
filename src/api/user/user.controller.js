@@ -154,14 +154,17 @@ module.exports = {
         newUser.picture = `${process.env.IMG_PLACEHOLDER}`
       }
       if(newUser.oldPassword){
-        const isValid = await bcrypt.compare(password, user.password);
+        const isValid = await bcrypt.compare(newUser.oldPassword, user.password);
         if (!isValid) {
-          throw new Error("contraseña o email invalidos");
+          throw new Error("la contraseña es invalida");
         }
+        const encPassword = await bcrypt.hash(newUser.password, 8);
+        newUser.password = encPassword
       }
       const updateUser = await User.findByIdAndUpdate(req.user, newUser, {
         new: true,
       });
+      console.log(updateUser)
       const { name, email, picture } = updateUser;
       res
         .status(200)
@@ -174,7 +177,7 @@ module.exports = {
         .status(400)
         .json({
           message: "No se ha podido actualizar el usuario",
-          data: error,
+          data: error.message,
         });
     }
   },
