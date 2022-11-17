@@ -113,7 +113,7 @@ module.exports = {
     }
   },
 
-  //get por token / id
+
   async show(req, res) {
     try {
       const user = await User.findById(req.user).populate({
@@ -142,7 +142,7 @@ module.exports = {
     }
   },
 
-  //update
+
   async update(req, res) {
     try {
       const user = await User.findById(req.user);
@@ -150,9 +150,21 @@ module.exports = {
       if (!user) {
         throw new Error("Token expirado");
       }
+      if(newUser.resetPicture){
+        newUser.picture = `${process.env.IMG_PLACEHOLDER}`
+      }
+      if(newUser.oldPassword){
+        const isValid = await bcrypt.compare(newUser.oldPassword, user.password);
+        if (!isValid) {
+          throw new Error("la contraseña es invalida");
+        }
+        const encPassword = await bcrypt.hash(newUser.password, 8);
+        newUser.password = encPassword
+      }
       const updateUser = await User.findByIdAndUpdate(req.user, newUser, {
         new: true,
       });
+      console.log(updateUser)
       const { name, email, picture } = updateUser;
       res
         .status(200)
@@ -165,16 +177,15 @@ module.exports = {
         .status(400)
         .json({
           message: "No se ha podido actualizar el usuario",
-          data: error,
+          data: error.message,
         });
     }
   },
 
-  //delete
+
   async destroy(req, res) {
     try {
       const user = await User.findByIdAndDelete(req.user);
-      //aqui se eliminaran las transaciones
       const { name, email, createdAt, updatedAt } = user;
       res.status(200).json({
         message: "Usuario eliminado correctamente",
