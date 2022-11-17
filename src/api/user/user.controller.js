@@ -164,7 +164,6 @@ module.exports = {
       const updateUser = await User.findByIdAndUpdate(req.user, newUser, {
         new: true,
       });
-      console.log(updateUser)
       const { name, email, picture } = updateUser;
       res
         .status(200)
