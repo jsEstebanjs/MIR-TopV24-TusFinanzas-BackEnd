@@ -153,6 +153,12 @@ module.exports = {
       if(newUser.resetPicture){
         newUser.picture = `${process.env.IMG_PLACEHOLDER}`
       }
+      if(newUser.oldPassword){
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) {
+          throw new Error("contraseña o email invalidos");
+        }
+      }
       const updateUser = await User.findByIdAndUpdate(req.user, newUser, {
         new: true,
       });
