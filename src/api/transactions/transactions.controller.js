@@ -3,6 +3,7 @@ const User = require("../user/user.model");
 const Subcategories = require("../subCategories/subCategories.model");
 
 module.exports = {
+  
   async list(req, res) {
     const { limit = 10, page = 1 } = req.query;
     const user = await User.findById(req.user);
@@ -44,9 +45,13 @@ module.exports = {
 
   async create(req, res) {
     try {
+      const date = new Date()
       const { subcategoryId } = req.body;
       const data = req.body;
-      const user = await User.findById(req.user);
+      const user = await User.findById(req.user).populate({
+        path:"transactionsIds",
+      })
+      const lastDate = new Date(user.transactionsIds[user.transactionsIds.length - 1]?.createdAt)
       const subcategory = await Subcategories.findById(subcategoryId);
       if (!user || !subcategory) {
         throw new Error("usuario o subcategoria no existen");
@@ -64,7 +69,16 @@ module.exports = {
           newTodoEntry = 0;
           newTodoExpense = data.amount;
         }
-      } else {
+      } 
+      else if(date.getMonth() !== lastDate.getMonth()){
+        if (subcategory.type === "Entry") {
+          newTodoEntry = data.amount;
+          newTodoExpense = 0
+        } else {
+          newTodoEntry = 0;
+          newTodoExpense = data.amount;
+        }
+      }else {
         if (subcategory.type === "Entry") {
           newTodoEntry = lastBalance.todoEntry + data.amount;
           newTodoExpense = lastBalance.todoExpense;
@@ -204,7 +218,7 @@ module.exports = {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const transactions = await Transactions.findById(id);
+      const transactions = await Transactions.findById(id)
       const newTransactions = req.body;
       if (!transactions) {
         throw new Error("Transaccion no encontrada");
