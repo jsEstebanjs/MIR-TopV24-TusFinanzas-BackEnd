@@ -169,7 +169,7 @@ module.exports = {
       }
 
       res.status(200).json({
-        message: "Transacciones  de los ultimos 6 meses encontradas",
+        message: "Transacciones de los ultimos 6 meses encontradas",
         data: transactionsPerMonth,
       });
     } catch (err) {

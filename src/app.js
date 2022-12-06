@@ -11,15 +11,15 @@ const cors = require('cors')
 const app = express();
 app.use(express.json())
 app.use(cors({
-    "origin": `${process.env.ORIGIN}`,
-    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-    "preflightContinue": false,
-    "optionsSuccessStatus": 204
-  }))
-app.use('/users',userRouter)
-app.use('/transactions',transactionsRouter)
-app.use('/categories',categoriesRouter)
-app.use('/subcategories',subcategoriesRouter)
+  "origin": `*`,
+  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+  "preflightContinue": false,
+  "optionsSuccessStatus": 204
+}))
+app.use('/users', userRouter)
+app.use('/transactions', transactionsRouter)
+app.use('/categories', categoriesRouter)
+app.use('/subcategories', subcategoriesRouter)
 app.use(mediaRoute)
 app.use(morgan("dev"))
 
