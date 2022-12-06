@@ -8,7 +8,6 @@ const subcategoriesRouter = require('./api/subCategories/subCategories.route')
 const mediaRoute = require('./api/multimedia/media.route')
 const cors = require('cors')
 
-
 const app = express();
 app.use(express.json())
 app.use(cors({
