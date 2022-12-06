@@ -3,7 +3,6 @@ const User = require("../user/user.model");
 const Subcategories = require("../subCategories/subCategories.model");
 
 module.exports = {
-  
   async list(req, res) {
     const { limit = 10, page = 1 } = req.query;
     const user = await User.findById(req.user);
@@ -45,13 +44,15 @@ module.exports = {
 
   async create(req, res) {
     try {
-      const date = new Date()
+      const date = new Date();
       const { subcategoryId } = req.body;
       const data = req.body;
       const user = await User.findById(req.user).populate({
-        path:"transactionsIds",
-      })
-      const lastDate = new Date(user.transactionsIds[user.transactionsIds.length - 1]?.createdAt)
+        path: "transactionsIds",
+      });
+      const lastDate = new Date(
+        user.transactionsIds[user.transactionsIds.length - 1]?.createdAt
+      );
       const subcategory = await Subcategories.findById(subcategoryId);
       if (!user || !subcategory) {
         throw new Error("usuario o subcategoria no existen");
@@ -69,16 +70,18 @@ module.exports = {
           newTodoEntry = 0;
           newTodoExpense = data.amount;
         }
-      } 
-      else if(date.getMonth() !== lastDate.getMonth()){
+      } else if (date.getMonth() !== lastDate.getMonth()) {
         if (subcategory.type === "Entry") {
-          newTodoEntry = data.amount;
-          newTodoExpense = 0
+          newTodoEntry =
+            user.transactionsIds[user.transactionsIds.length - 1].balance +
+            data.amount;
+          newTodoExpense = 0;
         } else {
-          newTodoEntry = 0;
+          newTodoEntry =
+            user.transactionsIds[user.transactionsIds.length - 1].balance;
           newTodoExpense = data.amount;
         }
-      }else {
+      } else {
         if (subcategory.type === "Entry") {
           newTodoEntry = lastBalance.todoEntry + data.amount;
           newTodoExpense = lastBalance.todoExpense;
@@ -144,33 +147,24 @@ module.exports = {
           break;
         }
         let currentMonth = transactions[i].createdAt.getMonth();
-        let lastMonth = transactionsPerMonth.length
-          ? transactionsPerMonth[transactionsPerMonth.length - 1].id
-          : null;
-        if (i === transactions.length - 1) {
+        let lastMonth = new Date().getMonth() ;
+        if (lastMonth === currentMonth) {
+          lastMonth = transactionsPerMonth.length
+            ? transactionsPerMonth[transactionsPerMonth.length - 1].id
+            : null;
+        }
+        while (lastMonth !== currentMonth && transactionsPerMonth.length < 6) {
+          if (lastMonth - 1 >= 0) {
+            lastMonth -= 1;
+          } else {
+            lastMonth = 11;
+          }
           transactionsPerMonth.push({
-            id: currentMonth,
+            id: lastMonth,
             balance: transactions[i].balance,
-            month: months[currentMonth],
+            month: months[lastMonth],
             test: transactions[i]._id,
           });
-        } else {
-          while (
-            lastMonth !== currentMonth &&
-            transactionsPerMonth.length < 6
-          ) {
-            if (lastMonth - 1 >= 0) {
-              lastMonth -= 1;
-            } else {
-              lastMonth = 11;
-            }
-            transactionsPerMonth.push({
-              id: lastMonth,
-              balance: transactions[i].balance,
-              month: months[lastMonth],
-              test: transactions[i]._id,
-            });
-          }
         }
       }
 
@@ -206,19 +200,17 @@ module.exports = {
         data: transactions,
       });
     } catch (err) {
-      res
-        .status(400)
-        .json({
-          message: "Transacciones del mes no encontradas",
-          error: err.message,
-        });
+      res.status(400).json({
+        message: "Transacciones del mes no encontradas",
+        error: err.message,
+      });
     }
   },
 
   async update(req, res) {
     try {
       const { id } = req.params;
-      const transactions = await Transactions.findById(id)
+      const transactions = await Transactions.findById(id);
       const newTransactions = req.body;
       if (!transactions) {
         throw new Error("Transaccion no encontrada");
