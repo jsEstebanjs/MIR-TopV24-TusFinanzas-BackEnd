@@ -11,7 +11,7 @@ const cors = require('cors')
 const app = express();
 app.use(express.json())
 app.use(cors({
-  "origin": `${process.env.ORIGIN}`,
+  "origin": `*`,
   "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
   "preflightContinue": false,
   "optionsSuccessStatus": 204
