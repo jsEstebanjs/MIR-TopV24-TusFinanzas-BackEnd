@@ -147,24 +147,34 @@ module.exports = {
           break;
         }
         let currentMonth = transactions[i].createdAt.getMonth();
-        let lastMonth = new Date().getMonth() ;
-        if (lastMonth === currentMonth) {
-          lastMonth = transactionsPerMonth.length
-            ? transactionsPerMonth[transactionsPerMonth.length - 1].id
-            : null;
-        }
-        while (lastMonth !== currentMonth && transactionsPerMonth.length < 6) {
-          if (lastMonth - 1 >= 0) {
-            lastMonth -= 1;
-          } else {
-            lastMonth = 11;
-          }
+
+        let lastMonth = transactionsPerMonth.length
+          ? transactionsPerMonth[transactionsPerMonth.length - 1].id
+          : null;
+        if (i === transactions.length - 1) {
           transactionsPerMonth.push({
-            id: lastMonth,
+            id: currentMonth,
             balance: transactions[i].balance,
-            month: months[lastMonth],
+            month: months[currentMonth],
             test: transactions[i]._id,
           });
+        } else {
+          while (
+            lastMonth !== currentMonth &&
+            transactionsPerMonth.length < 6
+          ) {
+            if (lastMonth - 1 >= 0) {
+              lastMonth -= 1;
+            } else {
+              lastMonth = 11;
+            }
+            transactionsPerMonth.push({
+              id: lastMonth,
+              balance: transactions[i].balance,
+              month: months[lastMonth],
+              test: transactions[i]._id,
+            });
+          }
         }
       }
 
