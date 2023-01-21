@@ -6,7 +6,6 @@ const transactionsSchema = new Schema(
     description:{
       type:String,
       required: [true, "El nombre es requerido"],
-      minlength: [3, "La longitud minima es 3"],
       maxlength: [100, "La longitud maxima es 100"],
     },
     amount: {
