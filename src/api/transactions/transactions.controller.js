@@ -147,6 +147,8 @@ module.exports = {
           break;
         }
         let currentMonth = transactions[i].createdAt.getMonth();
+        let currentYear = transactions[i].createdAt.getFullYear();
+        //
 
         let lastMonth = transactionsPerMonth.length
           ? transactionsPerMonth[transactionsPerMonth.length - 1].id
@@ -155,7 +157,7 @@ module.exports = {
           transactionsPerMonth.push({
             id: currentMonth,
             balance: transactions[i].balance,
-            month: months[currentMonth],
+            month: `${months[currentMonth]} ${currentYear}`,
             test: transactions[i]._id,
           });
         } else {
@@ -168,12 +170,21 @@ module.exports = {
             } else {
               lastMonth = 11;
             }
-            transactionsPerMonth.push({
-              id: lastMonth,
-              balance: transactions[i].balance,
-              month: months[lastMonth],
-              test: transactions[i]._id,
-            });
+            if(transactionsPerMonth[transactionsPerMonth.length - 1].id === months[0]){
+              transactionsPerMonth.push({
+                id: lastMonth,
+                balance: transactions[i].balance,
+                month: `${months[lastMonth]} ${currentYear - 1}`,
+                test: transactions[i]._id,
+              });
+            }else{
+              transactionsPerMonth.push({
+                id: lastMonth,
+                balance: transactions[i].balance,
+                month: `${months[lastMonth]} ${currentYear}`,
+                test: transactions[i]._id,
+              });
+            }
           }
         }
       }
@@ -188,6 +199,7 @@ module.exports = {
         .json({ message: "Transacciones no encontradas", error: err.message });
     }
   },
+
   async TransactionsOfTheMonth(req, res) {
     try {
       const { month, year } = req.query;
