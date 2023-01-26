@@ -127,29 +127,16 @@ module.exports = {
         throw new Error("no hay usuario o transacciones");
       }
 
-      const months = [
-        "Enero",
-        "Febrero",
-        "Marzo",
-        "Abril",
-        "Mayo",
-        "Junio",
-        "Julio",
-        "Agosto",
-        "Septiembre",
-        "Octubre",
-        "Noviembre",
-        "Diciembre",
-      ];
       const transactionsPerMonth = [];
       for (let i = transactions.length - 1; i >= 0; i--) {
         if (transactionsPerMonth.length === 6) {
           break;
         }
         let currentMonth = transactions[i].createdAt.getMonth();
-        let currentYear = transactions[i].createdAt.getFullYear();
-        //
 
+        let lastYear = new Date(transactionsPerMonth[transactionsPerMonth.length - 1]?.date)
+        lastYear = lastYear.getFullYear()
+        
         let lastMonth = transactionsPerMonth.length
           ? transactionsPerMonth[transactionsPerMonth.length - 1].id
           : null;
@@ -157,7 +144,7 @@ module.exports = {
           transactionsPerMonth.push({
             id: currentMonth,
             balance: transactions[i].balance,
-            month: `${months[currentMonth]} ${currentYear}`,
+            date: `${transactions[i].createdAt.getFullYear()}/${currentMonth + 1}/01`,
             test: transactions[i]._id,
           });
         } else {
@@ -170,21 +157,20 @@ module.exports = {
             } else {
               lastMonth = 11;
             }
-            if(transactionsPerMonth[transactionsPerMonth.length - 1].id === months[0]){
-              transactionsPerMonth.push({
+            /*
+            verificar fecha ultima transaccion si fue enero vamos a restarle el año
+            si no fue enero vamos a seguir usando la misma fecha, hasta que sea enero la bajamos -1
+            */ 
+            if (transactionsPerMonth[transactionsPerMonth.length - 1].id === 0) {
+              lastYear-- 
+            } 
+
+             transactionsPerMonth.push({
                 id: lastMonth,
                 balance: transactions[i].balance,
-                month: `${months[lastMonth]} ${currentYear - 1}`,
+                date: `${lastYear}/${lastMonth + 1}/01`,
                 test: transactions[i]._id,
               });
-            }else{
-              transactionsPerMonth.push({
-                id: lastMonth,
-                balance: transactions[i].balance,
-                month: `${months[lastMonth]} ${currentYear}`,
-                test: transactions[i]._id,
-              });
-            }
           }
         }
       }
